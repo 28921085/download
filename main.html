@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset = "utf-8">
+      <style type="text/css">
+          
+      </style>
+      
+   </head>
+   <body>
+        <p id="bot1"></p>
+        <p id="bot2"></p>
+        <p id="bot3"></p>
+        <input type="text" id = "playerin">
+        <input type="button" value="打出" id="event"><p id="player"></p>
+        <p id="display"></p>
+
+
+        <script src="listen.js"></script>
+      <script >
+        let dictionary=["1W","2W","3W","4W","5W","6W","7W","8W","9W","1T","2T","3T","4T","5T","6T","7T","8T","9T","1S","2S","3S","4S","5S","6S","7S","8S","9S","DONG","NAN","XI","BEI","ZHONG","FA","BAI",""];
+        //0-8 1w(萬)-9w 9-17 1t(桶)-9t 18-26 1s(索)-9s 27-33東南西北中發白
+        function mahjong(str){
+            for(let i=0;i<34;i++)
+                if(str==dictionary[i])
+                    return i;
+        }
+        class handCard{
+            //Array listenList
+            //let hand[13]
+            //let num[13]
+        }
+        let allCard=[];
+        let hand=new Array();
+        let bot1=document.getElementById("bot1");
+        let bot2=document.getElementById("bot2");
+        let bot3=document.getElementById("bot3");
+        let player=document.getElementById("player");
+        let draw=document.getElementById("display");
+        for(let i=0;i<34;i++){
+            for(let j=0;j<4;j++)
+                allCard[i*4+j]=mahjong(dictionary[i]);
+        }
+        for(let i=0;i<136;i++){//洗牌
+            let idx=Math.floor(Math.random()*136);
+            [allCard[i],allCard[idx]]=[allCard[idx],allCard[i]];
+        }
+        let current=0;
+        for(let i=0;i<4;i++){
+            hand[i]=new Array();
+            for(let j=0;j<16;j++)
+                hand[i][j]=allCard[current++];
+            hand[i].sort(function(a,b){
+                return a-b;
+            });
+        } 
+        function drawCard(){       
+            hand[3][16]=allCard[current++];
+        }
+        drawCard();
+        function display(target,n){
+            let str="";
+            for(let i=0;i<16;i++)
+                str+=dictionary[hand[n][i]]+"  ";
+            target.innerHTML=str;
+        }
+        function display2(){
+            let str="";
+            for(let i=0;i<16;i++)
+                str+=dictionary[hand[3][i]]+"  ";
+            str+="||||"+dictionary[hand[3][16]];
+            player.innerHTML=str;
+        }
+        function display3(str){
+            draw.innerHTML=str;
+        }
+        display(bot1,0);
+        display(bot2,1);
+        display(bot3,2);
+        display2();
+        let str1="";
+        function play(){
+            if(current==136-16)
+                return;
+            let n=parseInt(document.getElementById("playerin").value);
+            n--;
+            [hand[3][n],hand[3][16]]=[hand[3][16],hand[3][n]];
+            str1+=dictionary[hand[3][16]]+" ";
+            hand[3][16]=34;
+            hand[3].sort(function(a,b){
+                return a-b;
+            });
+
+            str1+=dictionary[hand[0][0]]+" ";
+            hand[0][0]=allCard[current++];
+            hand[0].sort(function(a,b){
+                return a-b;
+            });
+            display(bot1,0);
+            if(current==136-16)
+                return;
+
+            str1+=dictionary[hand[1][0]]+" ";
+            hand[1][0]=allCard[current++];
+            hand[1].sort(function(a,b){
+                return a-b;
+            });
+            display(bot2,1);
+            if(current==136-16)
+                return;
+
+            str1+=dictionary[hand[2][0]]+" ";
+            hand[2][0]=allCard[current++];
+            hand[2].sort(function(a,b){
+                return a-b;
+            });
+            display(bot3,2);
+            if(current==136-16)
+                return;
+
+            drawCard();
+            display3(str1);
+            display2();
+            document.getElementById("playerin").value="";
+        }
+        document.getElementById("event").addEventListener("click",play,false);
+
+        
+        //for(let i=0;i<136;i++)
+        //    document.writeln(allCard[i].val+"<br>");
+      </script>
+   </body>
+</html>
