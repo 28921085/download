@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Local Storage</title>
+    <style type="text/CSS">
+        table {
+            width: 90%;
+            border-collapse: collapse;
+            background-color: lightblue;
+            font-family: Perpetua;
+        }
+
+        table, td, th {
+            border: 1px solid black;
+            padding: 4px;
+        }
+
+        th {
+            text-align: center;
+            color: white;
+            background-color: darkblue;
+        }
+
+        tr.oddrow {
+            background-color: white;
+        }
+
+        td {
+            text-align: center;
+        }
+    </style>
+    
+</head>
+
+<body>
+    <form action="#">
+        <p>
+            <label>Book Title:
+                <input type="text" id="title">
+            </label>
+            <label>Author(s):
+                <input type="text" id="author">
+            </label>
+            <label>Year:
+                <input type="text" id="year">
+            </label>
+            <label>Book URL:
+                <input type="text" id="url">
+            </label>
+        </p>
+        <p>
+            <input type="button" value="Add New Item" id="addButton">
+            <input type="button" value="Remove All Items" id="removeAllButton">
+        </p>
+    </form>
+    <hr>
+
+    <div id="display">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Year</th>
+                    <th>URL</th>
+                </tr>
+            </thead>
+            <tbody id="table">
+            
+            </tbody>
+        </table>
+        
+    </div>
+    <script type="text/javascript">
+        // TODO
+        function show(){
+            let tags=[]
+            for(let i=0,j=0;i<localStorage.length;i++){
+                if(localStorage.key(i).indexOf("ntou-")==0){
+                    tags[j]=localStorage.key(i);
+                    j++;
+                }
+            }
+            tags.sort();
+            let str="";
+            let cnt=0
+            for(let tag in tags){
+                let query=localStorage.getItem(tags[tag]);
+                if(cnt%2){
+                    str+="<tr class='oddrow'>";
+                    query=query.split('"');
+                    str+="<td>"+query[3]+"</td>";
+                    str+="<td>"+query[7]+"</td>";
+                    str+="<td>"+query[11]+"</td>";
+                    str+="<td><a href='"+query[15]+"' target='_blank'>"+query[15]+"</a></td>";
+                    str+="</tr>";
+                }
+                else{
+                    str+="<tr>";
+                    query=query.split('"');
+                    str+="<td>"+query[3]+"</td>";
+                    str+="<td>"+query[7]+"</td>";
+                    str+="<td>"+query[11]+"</td>";
+                    str+="<td><a href='"+query[15]+"' target='_blank'>"+query[15]+"</a></td>";
+                    str+="</tr>";
+                }
+                cnt++;
+            }
+            document.getElementById("table").innerHTML=str;
+        }
+        function submit(){
+            let d=new Date();
+            let msec=d.getTime();
+            let t=document.getElementById("title").value;
+            let a=document.getElementById("author").value;
+            let y=document.getElementById("year").value;
+            let u=document.getElementById("url").value;
+            const dat={title:t,author:a,year:y,url:u};
+            const str=JSON.stringify(dat);
+            //document.getElementById("title").value=str;
+            document.getElementById("title").value="";
+            document.getElementById("author").value="";
+            document.getElementById("year").value="";
+            document.getElementById("url").value="";
+            localStorage.setItem("ntou-"+msec.toString(),str);
+            show();
+        }
+        function del(){
+            delTag=[];
+            for(let i=0,j=0;i<localStorage.length;i++){
+                if(localStorage.key(i).indexOf("ntou-")==0){
+                    delTag[j]=localStorage.key(i);
+                    j++;
+                }
+            }
+            for(let i=0;i<delTag.length;i++)
+                localStorage.removeItem(delTag[i]);
+            window.alert("All items were removed!");
+            show();
+        }
+        show();
+        document.getElementById("addButton").addEventListener("click",submit,false);
+        document.getElementById("removeAllButton").addEventListener("click",del,false);
+        
+    </script>
+</body>
+
+</html>
